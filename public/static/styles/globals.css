@@ -1,0 +1,42 @@
+/* progress bar */
+#nprogress .bar {
+  height: 4px !important;
+  background-color: green !important;
+}
+
+/* input icon background color */
+.input-group-text {
+  background-color: #fff !important;
+}
+
+/* input icon  */
+.icon-input {
+  height: 1.8rem;
+  width: 1.8rem;
+}
+
+/* submit button */
+.btn-submit {
+  width: 100%;
+}
+
+/* a link */
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
+}
+
+a:hover {
+  text-decoration: none;
+}
