@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 
 // endpoint/resource name - as noun, convention is to use plural
-// http method - as verb
+// http method - 'registerUser' as verb, action
 // app.get('/api/v1/users/registerUser', (req, res) => {
 //   res.status(200).json({
 //     status: 'success',

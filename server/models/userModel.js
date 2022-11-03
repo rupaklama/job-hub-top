@@ -1,12 +1,15 @@
 const mongoose = require('mongoose');
 
+// node js module
+const crypto = require('crypto');
+
 // user schema
 const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
 
-      // to remove whitespace from the beginning & trailing - end
+      // to remove beginning & trailing whitespace - end
       trim: true,
 
       required: true,
@@ -35,6 +38,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    // hashed key/password saved in db
     hashed_password: {
       type: String,
       required: true,
@@ -61,10 +65,56 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/*  virtual fields is to hash password before saving to database */
-// 1. authenticate - method to check if user input password matches
-// the hashed password to allow authentication
+/*  virtual fields is to add a custom setter to hash password before saving to db */
+userSchema
+  // creating Virtual Property - userInput
+  .virtual('password')
+  // note - Arrow function won't work in this userSchema
+  .set(function (password) {
+    // create temp variable called _password
+    this._password = password;
 
-// 2. encryptPassword: to hash the password before saving to db
+    // generate salt
+    this.salt = this.makeSalt();
 
-module.exports = userSchema;
+    // encrypt password to save in db
+    this.hashed_password = this.encryptPassword(password);
+  })
+
+  .get(function () {
+    return this.hashed_password;
+  });
+
+// to apply our custom methods
+userSchema.methods = {
+  // salt
+  makeSalt: function () {
+    return String(Math.round(new Date().valueOf() * Math.random()));
+  },
+
+  // encryptPassword: to hash the password before saving to db
+  encryptPassword: function (password) {
+    if (!password) return '';
+
+    try {
+      return crypto
+        .createHmac('sha1', this.salt)
+        .update(password)
+        .digest('hex');
+    } catch (err) {
+      return '';
+    }
+  },
+
+  // method to check if user current input password matches the hashed password/key in db to allow authentication
+  authenticate: function (password) {
+    return this.encryptPassword(password) === this.hashed_password;
+  },
+};
+
+// convention to always use uppercase for Modal Names & related variables
+// telling mongoose to create new model class instance
+// first arg - name of the collection & second arg - name of the the Schema, data model
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
